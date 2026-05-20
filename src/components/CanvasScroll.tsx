@@ -153,7 +153,7 @@ export default function CanvasScroll({ frameCount: _ignored }: CanvasScrollProps
 
         {/* Storytelling Content Overlays */}
         <div className="absolute top-0 left-0 w-full h-full pointer-events-none z-20">
-          <StorytellingOverlays scrollYProgress={scrollYProgress} loaded={loaded} />
+          <StorytellingOverlays scrollYProgress={scrollYProgress} loaded={loaded} currentSequenceIndex={currentSequenceIndex} />
         </div>
       </div>
     </section>
