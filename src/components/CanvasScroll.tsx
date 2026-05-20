@@ -12,7 +12,8 @@ interface CanvasScrollProps {
 
 const SEQUENCES = [
   { pathPrefix: '/frames/frame_', frameCount: 209, padLength: 4 },
-  { pathPrefix: '/frames-2/ezgif-frame-', frameCount: 240, padLength: 3 }
+  { pathPrefix: '/frames-2/ezgif-frame-', frameCount: 240, padLength: 3 },
+  { pathPrefix: '/frames-3/ezgif-frame-', frameCount: 240, padLength: 3 }
 ];
 
 export default function CanvasScroll({ frameCount: _ignored }: CanvasScrollProps) {
