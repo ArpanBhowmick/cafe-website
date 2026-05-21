@@ -3,32 +3,65 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 
-const stats = [
-  { label: 'Top Speed', value: 'Mach 2.5', highlight: true },
-  { label: '0-60 mph', value: '1.2s' },
-  { label: 'Range', value: '1200mi' },
-  { label: 'Charge Time', value: '15m' }
+const statsByDrink = [
+  { // Matcha
+    title: "Uncompromising Quality",
+    subtitle: "Sourced for the perfect cup.",
+    stats: [
+      { label: 'Origin', value: 'Uji, JP', highlight: true },
+      { label: 'Caffeine', value: '70mg' },
+      { label: 'Calories', value: '5 kcal' },
+      { label: 'Prep Time', value: '2m' }
+    ]
+  },
+  { // Cappuccino
+    title: "Expert Precision",
+    subtitle: "The perfect ratio in every cup.",
+    stats: [
+      { label: 'Origin', value: 'Italy', highlight: true },
+      { label: 'Caffeine', value: '65mg' },
+      { label: 'Calories', value: '120 kcal' },
+      { label: 'Prep Time', value: '3m' }
+    ]
+  },
+  { // Taro Bubble Tea
+    title: "Signature Indulgence",
+    subtitle: "Freshly crafted daily.",
+    stats: [
+      { label: 'Origin', value: 'Taiwan', highlight: true },
+      { label: 'Caffeine', value: '30mg' },
+      { label: 'Calories', value: '250 kcal' },
+      { label: 'Prep Time', value: '5m' }
+    ]
+  }
 ];
 
-export default function TechnicalShowcase() {
+interface TechnicalShowcaseProps {
+  currentDrinkIndex?: number;
+}
+
+export default function TechnicalShowcase({ currentDrinkIndex = 0 }: TechnicalShowcaseProps) {
+  const currentContent = statsByDrink[currentDrinkIndex] || statsByDrink[0];
+
   return (
     <section id="specs" className="py-32 bg-[#050505] text-white">
       <div className="max-w-7xl mx-auto px-6 md:px-12">
         <motion.div
+          key={`header-${currentDrinkIndex}`}
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true, margin: "-100px" }}
           transition={{ duration: 1 }}
           className="text-center mb-24"
         >
-          <p className="text-sm tracking-widest uppercase text-gray-500 mb-4">Uncompromising Performance</p>
-          <h2 className="text-4xl md:text-6xl font-light">Pushing the boundaries<br/>of what's possible.</h2>
+          <p className="text-sm tracking-widest uppercase text-gray-500 mb-4">{currentContent.title}</p>
+          <h2 className="text-4xl md:text-6xl font-light">{currentContent.subtitle}</h2>
         </motion.div>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
-          {stats.map((stat, idx) => (
+          {currentContent.stats.map((stat, idx) => (
             <motion.div
-              key={idx}
+              key={`stat-${currentDrinkIndex}-${idx}`}
               initial={{ opacity: 0, scale: 0.95 }}
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true, margin: "-50px" }}
@@ -38,7 +71,7 @@ export default function TechnicalShowcase() {
               {/* Subtle hover gradient */}
               <div className="absolute inset-0 bg-gradient-to-t from-white/[0.05] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               
-              <span className={`text-4xl md:text-6xl font-light mb-2 ${stat.highlight ? 'text-white' : 'text-gray-300'}`}>
+              <span className={`text-3xl md:text-5xl font-light mb-2 ${stat.highlight ? 'text-white' : 'text-gray-300'}`}>
                 {stat.value}
               </span>
               <span className="text-gray-500 text-sm tracking-wider uppercase">{stat.label}</span>

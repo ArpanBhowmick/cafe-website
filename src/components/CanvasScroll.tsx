@@ -8,6 +8,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface CanvasScrollProps {
   frameCount?: number; // Kept for backward compatibility, but overridden internally
+  onSequenceChange?: (index: number) => void;
 }
 
 const SEQUENCES = [
@@ -16,7 +17,7 @@ const SEQUENCES = [
   { pathPrefix: '/frames-3/ezgif-frame-', frameCount: 240, padLength: 3 }
 ];
 
-export default function CanvasScroll({ frameCount: _ignored }: CanvasScrollProps) {
+export default function CanvasScroll({ frameCount: _ignored, onSequenceChange }: CanvasScrollProps) {
   const [currentSequenceIndex, setCurrentSequenceIndex] = useState(0);
   const activeSequence = SEQUENCES[currentSequenceIndex];
 
@@ -32,9 +33,17 @@ export default function CanvasScroll({ frameCount: _ignored }: CanvasScrollProps
 
   const toggleSequence = (direction: 'left' | 'right') => {
     if (direction === 'left') {
-      setCurrentSequenceIndex((prev) => (prev > 0 ? prev - 1 : SEQUENCES.length - 1));
+      setCurrentSequenceIndex((prev) => {
+        const next = prev > 0 ? prev - 1 : SEQUENCES.length - 1;
+        if (onSequenceChange) onSequenceChange(next);
+        return next;
+      });
     } else {
-      setCurrentSequenceIndex((prev) => (prev < SEQUENCES.length - 1 ? prev + 1 : 0));
+      setCurrentSequenceIndex((prev) => {
+        const next = prev < SEQUENCES.length - 1 ? prev + 1 : 0;
+        if (onSequenceChange) onSequenceChange(next);
+        return next;
+      });
     }
   };
 

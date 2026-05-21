@@ -4,7 +4,11 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 
-export default function FinalReveal() {
+interface FinalRevealProps {
+  onPreOrderClick?: () => void;
+}
+
+export default function FinalReveal({ onPreOrderClick }: FinalRevealProps) {
   return (
     <section className="relative w-full min-h-[80vh] flex flex-col items-center justify-center bg-black overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-t from-white/[0.02] to-transparent pointer-events-none" />
@@ -37,7 +41,10 @@ export default function FinalReveal() {
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.3 }}
         >
-          <button className="group relative inline-flex items-center justify-center px-8 py-4 bg-white text-black rounded-full text-lg font-medium overflow-hidden">
+          <button 
+            onClick={onPreOrderClick}
+            className="group relative inline-flex items-center justify-center px-8 py-4 bg-white text-black rounded-full text-lg font-medium overflow-hidden cursor-pointer"
+          >
             <div className="absolute inset-0 w-full h-full bg-gray-200 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300 ease-out" />
             <span className="relative flex items-center">
               Pre-order Now
