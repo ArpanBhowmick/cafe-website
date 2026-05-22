@@ -2,71 +2,110 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
+import BorderGlow from './BorderGlow';
+import ScrollStack, { ScrollStackItem } from './ScrollStack';
 
+// Expanded cinematic data
 const featuresByDrink = [
   { // Matcha
-    title: "The Craft of",
-    subtitle: "Matcha.",
-    description: "Discover the meticulous process and premium ingredients that go into every ceremonial bowl.",
-    features: [
+    themeColor: '#4ade80',
+    about: {
+      title: "The Craft of",
+      subtitle: "Matcha.",
+      desc: "An ancient tradition reimagined for the modern palate. We source our ceremonial grade matcha directly from the shaded hills of Uji, Japan, ensuring a vibrant jade color and unparalleled umami richness. Every bowl represents a mindful pause in your day, blending centuries of traditional stone-ground preparation with contemporary luxury to deliver sustained, clean energy and profound focus."
+    },
+    sections: [
       {
-        title: 'How It\'s Made',
-        description: 'Stone-ground into a fine powder from specially grown, shade-covered green tea leaves. Whisked with a bamboo chasen to perfect frothiness.',
-        delay: 0.1
+        title: "The Foundation",
+        subtitle: "Premium Ingredients",
+        content: "100% Ceremonial Grade Uji Matcha, shade-grown and stone-ground to preserve its vibrant color and delicate nutrients. Blended only with pure hot water or lightly steamed oat milk for the perfect latte.",
+        icon: "🍃"
       },
       {
-        title: 'Ingredients',
-        description: '100% Ceremonial Grade Uji Matcha, pure hot water. Optionally paired with lightly steamed oat or almond milk for lattes.',
-        delay: 0.2
+        title: "The Process",
+        subtitle: "How It's Made",
+        content: "Carefully measured into a warmed bowl, hot water is added at exactly 175°F. It is then vigorously whisked in a 'W' motion using a traditional bamboo chasen until a perfect, jade-green froth forms.",
+        icon: "🏺"
       },
       {
-        title: 'Taste Profile',
-        description: 'Earthy, umami-rich, and naturally sweet with a vibrant, grassy finish. A refined balance of depth and smooth texture.',
-        delay: 0.3
+        title: "The Wellness",
+        subtitle: "Health Benefits",
+        content: "Packed with L-theanine for sustained, jitter-free energy and calm focus. Exceptionally rich in antioxidants (EGCG) to support metabolism and overall vitality.",
+        icon: "✨"
+      },
+      {
+        title: "The Experience",
+        subtitle: "Taste Profile",
+        content: "Deeply earthy and umami-rich, balanced with a natural, subtle sweetness. It finishes with a vibrant, grassy note that lingers gently on the palate.",
+        icon: "🍵"
       }
     ]
   },
   { // Cappuccino
-    title: "The Perfect",
-    subtitle: "Cappuccino.",
-    description: "Experience the ultimate expression of coffee, combining bold espresso with velvety textured milk.",
-    features: [
+    themeColor: '#d97706',
+    about: {
+      title: "The Perfect",
+      subtitle: "Cappuccino.",
+      desc: "Experience the ultimate expression of coffee craftsmanship. We select only the finest ethically sourced Arabica beans, roasted to perfection to draw out their deepest chocolate and caramel notes. Each cup is a masterful balance of intense, rich double espresso harmonized perfectly with luxuriously textured, sweet microfoam, creating a deeply comforting ritual that awakens the senses."
+    },
+    sections: [
       {
-        title: 'How It\'s Made',
-        description: 'Pulled as a rich, robust espresso shot, then immediately topped with deeply textured steamed milk and a thick layer of microfoam.',
-        delay: 0.1
+        title: "The Foundation",
+        subtitle: "Premium Ingredients",
+        content: "Freshly roasted, ethically sourced Arabica beans ground moments before brewing. Paired with precisely filtered water and your choice of perfectly steamed milk.",
+        icon: "☕"
       },
       {
-        title: 'Ingredients',
-        description: 'Freshly roasted premium Arabica espresso beans, filtered water, and precisely steamed milk.',
-        delay: 0.2
+        title: "The Process",
+        subtitle: "How It's Made",
+        content: "A double ristretto shot is pulled with precise pressure and timing. Simultaneously, milk is micro-aerated to create a dense, velvety foam that is gently folded into the crema.",
+        icon: "⚙️"
       },
       {
-        title: 'Taste Profile',
-        description: 'Bold, full-bodied coffee flavor perfectly balanced by the natural creamy sweetness of the thick milk foam.',
-        delay: 0.3
+        title: "The Wellness",
+        subtitle: "Health Benefits",
+        content: "A natural source of robust energy and mental clarity. Rich in essential antioxidants from the dark roast, supporting heart health and cognitive function.",
+        icon: "🔥"
+      },
+      {
+        title: "The Experience",
+        subtitle: "Taste Profile",
+        content: "A bold, full-bodied espresso foundation perfectly harmonized by the natural, caramelized sweetness of thick microfoam. Rich, warm, and deeply comforting.",
+        icon: "🤎"
       }
     ]
   },
   { // Taro Bubble Tea
-    title: "Signature Taro",
-    subtitle: "Boba.",
-    description: "Indulge in our sweet, creamy, and distinctively purple Taiwanese classic.",
-    features: [
+    themeColor: '#c084fc',
+    about: {
+      title: "Signature Taro",
+      subtitle: "Boba.",
+      desc: "Indulge in our sweet, creamy, and distinctively purple Taiwanese classic. We elevate this nostalgic treat by using real, fresh-cooked taro root instead of artificial powders, blending it flawlessly with premium jasmine green tea. Served over our signature slow-simmered, caramelized boba pearls, it offers a beautifully layered texture and a naturally sweet, nutty flavor profile that feels both playful and incredibly premium."
+    },
+    sections: [
       {
-        title: 'How It\'s Made',
-        description: 'Fresh taro root is cooked and blended with milk and tea, then poured over slow-simmered, caramelized tapioca pearls.',
-        delay: 0.1
+        title: "The Foundation",
+        subtitle: "Premium Ingredients",
+        content: "Real, fresh Taro root, premium Jasmine Green Tea, rich dairy or oat creamer, and our signature slow-cooked Tapioca Pearls bathed in dark brown sugar.",
+        icon: "🍠"
       },
       {
-        title: 'Ingredients',
-        description: 'Fresh Taro Root, premium Jasmine Green Tea, rich creamer, brown sugar, and daily-cooked Tapioca Pearls (Boba).',
-        delay: 0.2
+        title: "The Process",
+        subtitle: "How It's Made",
+        content: "Fresh taro is cooked until tender, then blended smoothly into a creamy tea base. It is then poured over warm, caramelized boba pearls prepared fresh every morning.",
+        icon: "🥣"
       },
       {
-        title: 'Taste Profile',
-        description: 'Sweet, creamy, and nutty with hints of vanilla, perfectly complemented by the chewy texture of warm boba.',
-        delay: 0.3
+        title: "The Wellness",
+        subtitle: "Health Benefits",
+        content: "Taro root provides a healthy dose of dietary fiber, potassium, and complex carbohydrates for sustained energy, while Jasmine tea offers gentle antioxidants.",
+        icon: "💜"
+      },
+      {
+        title: "The Experience",
+        subtitle: "Taste Profile",
+        content: "Incredibly creamy, sweet, and wonderfully nutty with subtle hints of vanilla. The texture is a delightful contrast between smooth milk tea and warm, chewy boba.",
+        icon: "🧋"
       }
     ]
   }
@@ -80,40 +119,81 @@ export default function FeatureRevealSection({ currentDrinkIndex = 0 }: FeatureR
   const currentContent = featuresByDrink[currentDrinkIndex] || featuresByDrink[0];
 
   return (
-    <section id="features" className="py-32 bg-black text-white relative">
-      <div className="max-w-7xl mx-auto px-6 md:px-12">
+    <section id="features" className="bg-black text-white relative pb-5">
+      
+      {/* Cinematic Intro Block */}
+      <div className="max-w-7xl mx-auto px-6 md:px-12 pt-16 pb-12">
         <motion.div 
           key={`header-${currentDrinkIndex}`}
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
           transition={{ duration: 0.8, ease: "easeOut" }}
-          className="mb-24 md:w-2/3"
+          className="md:w-2/3"
         >
-          <h2 className="text-5xl md:text-7xl font-light tracking-tight mb-8">
-            {currentContent.title} <br/> <span className="font-medium">{currentContent.subtitle}</span>
+          <h2 className="text-5xl md:text-8xl font-light tracking-tight mb-8">
+            {currentContent.about.title} <br/> 
+            <span className="font-medium" style={{ color: currentContent.themeColor }}>
+              {currentContent.about.subtitle}
+            </span>
           </h2>
-          <p className="text-xl text-gray-400 font-light leading-relaxed">
-            {currentContent.description}
+          <p className="text-xl md:text-2xl text-gray-400 font-light leading-relaxed">
+            {currentContent.about.desc}
           </p>
         </motion.div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-8">
-          {currentContent.features.map((feature, idx) => (
-            <motion.div
-              key={`feature-${currentDrinkIndex}-${idx}`}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{ duration: 0.8, delay: feature.delay, ease: "easeOut" }}
-              className="p-8 rounded-3xl bg-white/[0.03] border border-white/10 hover:bg-white/[0.08] transition-colors"
-            >
-              <h3 className="text-2xl font-medium mb-4">{feature.title}</h3>
-              <p className="text-gray-400 leading-relaxed font-light">{feature.description}</p>
-            </motion.div>
-          ))}
-        </div>
       </div>
+
+      {/* Interactive Storytelling Stack */}
+      <div className="w-full relative">
+        <ScrollStack 
+          useWindowScroll={true} 
+          itemDistance={30}
+          itemStackDistance={50}
+          baseScale={0.9}
+          scaleEndPosition="5%"
+        >
+          {currentContent.sections.map((section, idx) => (
+            <ScrollStackItem 
+              key={`section-${currentDrinkIndex}-${idx}`} 
+              itemClassName="w-full h-auto md:h-[400px] my-4 p-0 md:p-0 bg-transparent rounded-[32px] overflow-hidden"
+            >
+              <BorderGlow
+                className="w-full h-full"
+                backgroundColor="#0a0a0a"
+                borderRadius={32}
+              >
+                {/* Card Content */}
+                <div className="w-full h-full flex flex-col md:flex-row relative">
+                  
+                  {/* Glassmorphism gradient behind text */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-white/[0.03] to-transparent pointer-events-none" />
+                  
+                  {/* Left Side: Number & Icon */}
+                  <div className="w-full md:w-1/3 p-8 md:p-12 border-b md:border-b-0 md:border-r border-white/10 flex flex-col justify-between">
+                    <span className="text-6xl md:text-8xl font-light text-white/10">0{idx + 1}</span>
+                    <div className="mt-8 md:mt-0">
+                      <span className="text-4xl mb-4 block">{section.icon}</span>
+                      <p className="text-sm tracking-[0.2em] uppercase text-gray-500 font-medium">{section.title}</p>
+                    </div>
+                  </div>
+
+                  {/* Right Side: Copy */}
+                  <div className="w-full md:w-2/3 p-8 md:p-12 flex flex-col justify-center">
+                    <h3 className="text-3xl md:text-5xl font-light mb-6 text-white tracking-tight">
+                      {section.subtitle}
+                    </h3>
+                    <p className="text-lg md:text-2xl text-gray-400 font-light leading-relaxed max-w-2xl">
+                      {section.content}
+                    </p>
+                  </div>
+                  
+                </div>
+              </BorderGlow>
+            </ScrollStackItem>
+          ))}
+        </ScrollStack>
+      </div>
+      
     </section>
   );
 }

@@ -106,7 +106,7 @@ export default function StorytellingOverlays({ scrollYProgress, loaded = true, c
       {/* Scroll Indicator */}
       {loaded && showScrollIndicator && (
         <motion.div 
-          style={{ opacity: scrollIndicatorOpacity }}
+          style={{ opacity: scrollIndicatorOpacity, willChange: "opacity" }}
           className="absolute bottom-[5vh] w-full flex justify-center text-white/50 z-20"
         >
           <span className="text-xs uppercase tracking-widest text-gray-500">Scroll to explore</span>
@@ -115,7 +115,7 @@ export default function StorytellingOverlays({ scrollYProgress, loaded = true, c
 
       {/* Narrative Beat 1 */}
       <motion.div 
-        style={{ opacity: opacity1, y: y1 }}
+        style={{ opacity: opacity1, y: y1, willChange: "opacity, transform" }}
         className="absolute top-[30vh] md:top-[40vh] left-6 md:left-24 max-w-[calc(100vw-3rem)] md:max-w-md text-white drop-shadow-2xl z-20"
       >
         <p className="text-xs font-medium tracking-[0.2em] uppercase text-gray-400 mb-2 md:mb-4">{content.block1.subtitle}</p>
@@ -127,7 +127,7 @@ export default function StorytellingOverlays({ scrollYProgress, loaded = true, c
 
       {/* Narrative Beat 2 */}
       <motion.div 
-        style={{ opacity: opacity2, y: y2 }}
+        style={{ opacity: opacity2, y: y2, willChange: "opacity, transform" }}
         className="absolute top-[40vh] right-6 md:right-24 max-w-[calc(100vw-3rem)] md:max-w-md text-white text-right drop-shadow-2xl z-20"
       >
         <p className="text-xs font-medium tracking-[0.2em] uppercase text-gray-400 mb-2 md:mb-4">{content.block2.subtitle}</p>
@@ -140,7 +140,7 @@ export default function StorytellingOverlays({ scrollYProgress, loaded = true, c
       {/* Narrative Beat 3 */}
       <div className="absolute bottom-[20vh] w-full flex justify-center pointer-events-none z-20">
         <motion.div 
-          style={{ opacity: opacity3, y: y3 }}
+          style={{ opacity: opacity3, y: y3, willChange: "opacity, transform" }}
           className="max-w-[calc(100vw-3rem)] md:max-w-2xl text-white text-center drop-shadow-2xl px-6"
         >
           <h2 className="text-4xl sm:text-5xl md:text-7xl font-medium tracking-tighter mb-4 md:mb-6">

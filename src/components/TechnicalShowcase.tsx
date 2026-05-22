@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
+import BorderGlow from './BorderGlow';
 
 const statsByDrink = [
   { // Matcha
@@ -66,15 +67,23 @@ export default function TechnicalShowcase({ currentDrinkIndex = 0 }: TechnicalSh
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true, margin: "-50px" }}
               transition={{ duration: 0.5, delay: idx * 0.1 }}
-              className="flex flex-col items-center justify-center p-8 md:p-12 rounded-2xl bg-black border border-white/5 shadow-2xl relative overflow-hidden group"
+              className="h-full"
             >
-              {/* Subtle hover gradient */}
-              <div className="absolute inset-0 bg-gradient-to-t from-white/[0.05] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-              
-              <span className={`text-3xl md:text-5xl font-light mb-2 ${stat.highlight ? 'text-white' : 'text-gray-300'}`}>
-                {stat.value}
-              </span>
-              <span className="text-gray-500 text-sm tracking-wider uppercase">{stat.label}</span>
+              <BorderGlow
+                className="h-full w-full"
+                backgroundColor="#000000"
+                borderRadius={16}
+              >
+                <div className="flex flex-col items-center justify-center p-8 md:p-12 h-full relative group">
+                  {/* Subtle hover gradient */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-white/[0.05] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                  
+                  <span className={`text-3xl md:text-5xl font-light mb-2 ${stat.highlight ? 'text-white' : 'text-gray-300'}`}>
+                    {stat.value}
+                  </span>
+                  <span className="text-gray-500 text-sm tracking-wider uppercase">{stat.label}</span>
+                </div>
+              </BorderGlow>
             </motion.div>
           ))}
         </div>

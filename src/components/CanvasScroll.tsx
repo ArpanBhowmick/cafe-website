@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useRef, useEffect, useState } from 'react';
-import { useScroll } from 'framer-motion';
+import { useScroll, useSpring } from 'framer-motion';
 import { useCanvasSequence } from '@/hooks/useCanvasSequence';
 import StorytellingOverlays from './StorytellingOverlays';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
@@ -31,6 +31,13 @@ export default function CanvasScroll({ frameCount: _ignored, onSequenceChange }:
     offset: ['start start', 'end end'],
   });
 
+  // Apply frame interpolation for Apple/Tesla level smoothness
+  const smoothProgress = useSpring(scrollYProgress, {
+    stiffness: 400,
+    damping: 90,
+    restDelta: 0.001
+  });
+
   const toggleSequence = (direction: 'left' | 'right') => {
     if (direction === 'left') {
       setCurrentSequenceIndex((prev) => {
@@ -53,56 +60,81 @@ export default function CanvasScroll({ frameCount: _ignored, onSequenceChange }:
     const canvas = canvasRef.current;
     if (!canvas) return;
     
+    // Disable alpha for huge rendering speedup since we don't have transparency
     const ctx = canvas.getContext('2d', { alpha: false });
     if (!ctx) return;
 
     let animationFrameId: number;
     let currentRenderedIndex = -1;
+    
+    // Cached geometry to prevent expensive Math on every frame
+    let cachedScale = 1;
+    let cachedX = 0;
+    let cachedY = 0;
 
     const renderFrame = (index: number) => {
       const imgIndex = Math.min(Math.max(Math.round(index), 0), activeSequence.frameCount - 1);
-      
-      // Prevent unnecessary re-renders
       if (imgIndex === currentRenderedIndex) return;
       
       const img = images[imgIndex];
-      
       if (img && img.complete) {
         currentRenderedIndex = imgIndex;
-        
-        // Calculate aspect ratio for object-fit: cover
-        const canvasW = window.innerWidth;
-        const canvasH = window.innerHeight;
-        
-        const scale = Math.max(canvasW / img.width, canvasH / img.height);
-        const x = (canvasW / 2) - (img.width / 2) * scale;
-        const y = (canvasH / 2) - (img.height / 2) * scale;
-        
-        ctx.fillStyle = '#000';
-        ctx.fillRect(0, 0, canvasW, canvasH);
-        ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
+        // Draw image directly using pre-calculated dimensions.
+        // No fillRect needed because object-fit:cover guarantees full coverage
+        ctx.drawImage(img, cachedX, cachedY, img.width * cachedScale, img.height * cachedScale);
       }
     };
 
+    let resizeTimeout: NodeJS.Timeout;
     const resizeCanvas = () => {
-      // Use device pixel ratio for sharper rendering on retina displays
-      const dpr = window.devicePixelRatio || 1;
-      canvas.width = window.innerWidth * dpr;
-      canvas.height = window.innerHeight * dpr;
-      ctx.scale(dpr, dpr);
-      
-      // Force render on resize
-      currentRenderedIndex = -1;
-      const currentIndex = scrollYProgress.get() * (activeSequence.frameCount - 1);
-      renderFrame(currentIndex);
+      // Debounce resize to prevent layout thrashing
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(() => {
+        const dpr = window.devicePixelRatio || 1;
+        const cw = window.innerWidth;
+        const ch = window.innerHeight;
+        
+        canvas.width = cw * dpr;
+        canvas.height = ch * dpr;
+        ctx.scale(dpr, dpr);
+        
+        // Cache geometry based on the first loaded image
+        const sampleImg = images[0];
+        if (sampleImg && sampleImg.width > 0) {
+          cachedScale = Math.max(cw / sampleImg.width, ch / sampleImg.height);
+          cachedX = (cw / 2) - (sampleImg.width / 2) * cachedScale;
+          cachedY = (ch / 2) - (sampleImg.height / 2) * cachedScale;
+        }
+        
+        // Force render
+        currentRenderedIndex = -1;
+        renderFrame(smoothProgress.get() * (activeSequence.frameCount - 1));
+      }, 50);
     };
 
-    window.addEventListener('resize', resizeCanvas);
-    resizeCanvas(); // Initial render
+    // Calculate initial geometry synchronously without debounce to avoid flash
+    const initGeometry = () => {
+      const dpr = window.devicePixelRatio || 1;
+      const cw = window.innerWidth;
+      const ch = window.innerHeight;
+      canvas.width = cw * dpr;
+      canvas.height = ch * dpr;
+      ctx.scale(dpr, dpr);
+      const sampleImg = images[0];
+      if (sampleImg && sampleImg.width > 0) {
+        cachedScale = Math.max(cw / sampleImg.width, ch / sampleImg.height);
+        cachedX = (cw / 2) - (sampleImg.width / 2) * cachedScale;
+        cachedY = (ch / 2) - (sampleImg.height / 2) * cachedScale;
+      }
+      renderFrame(smoothProgress.get() * (activeSequence.frameCount - 1));
+    };
+    
+    initGeometry();
+    
+    window.addEventListener('resize', resizeCanvas, { passive: true });
 
-    // Setup subscription to framer-motion scroll transform
-    const unsubscribe = scrollYProgress.on('change', (latest) => {
-      // Use requestAnimationFrame to sync with display refresh rate
+    // Use smoothed progress for buttery transitions
+    const unsubscribe = smoothProgress.on('change', (latest) => {
       if (animationFrameId) {
         cancelAnimationFrame(animationFrameId);
       }
@@ -114,12 +146,11 @@ export default function CanvasScroll({ frameCount: _ignored, onSequenceChange }:
 
     return () => {
       window.removeEventListener('resize', resizeCanvas);
+      clearTimeout(resizeTimeout);
       unsubscribe();
-      if (animationFrameId) {
-        cancelAnimationFrame(animationFrameId);
-      }
+      if (animationFrameId) cancelAnimationFrame(animationFrameId);
     };
-  }, [loaded, images, activeSequence.frameCount, scrollYProgress]);
+  }, [loaded, images, activeSequence.frameCount, smoothProgress]);
 
   return (
     <section ref={containerRef} className="relative w-full h-[500vh] bg-black">
@@ -133,7 +164,11 @@ export default function CanvasScroll({ frameCount: _ignored, onSequenceChange }:
         <canvas 
           ref={canvasRef} 
           className="w-full h-full object-cover transition-opacity duration-1000"
-          style={{ opacity: loaded ? 1 : 0 }}
+          style={{ 
+            opacity: loaded ? 1 : 0,
+            transform: 'translateZ(0)',
+            willChange: 'transform'
+          }}
         />
         
         {/* Left Navigation Zone */}
@@ -162,7 +197,7 @@ export default function CanvasScroll({ frameCount: _ignored, onSequenceChange }:
 
         {/* Storytelling Content Overlays */}
         <div className="absolute top-0 left-0 w-full h-full pointer-events-none z-20">
-          <StorytellingOverlays scrollYProgress={scrollYProgress} loaded={loaded} currentSequenceIndex={currentSequenceIndex} />
+          <StorytellingOverlays scrollYProgress={smoothProgress} loaded={loaded} currentSequenceIndex={currentSequenceIndex} />
         </div>
       </div>
     </section>
