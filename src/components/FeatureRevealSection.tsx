@@ -119,7 +119,7 @@ export default function FeatureRevealSection({ currentDrinkIndex = 0 }: FeatureR
   const currentContent = featuresByDrink[currentDrinkIndex] || featuresByDrink[0];
 
   return (
-    <section id="features" className="bg-black text-white relative pb-5 overflow-x-hidden">
+    <section id="features" className="bg-black text-white relative pb-5 overflow-x-clip">
       
       {/* Cinematic Intro Block */}
       <div className="max-w-7xl mx-auto px-6 md:px-12 pt-16 pb-12">

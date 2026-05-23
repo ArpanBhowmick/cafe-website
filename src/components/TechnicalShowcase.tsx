@@ -45,7 +45,7 @@ export default function TechnicalShowcase({ currentDrinkIndex = 0 }: TechnicalSh
   const currentContent = statsByDrink[currentDrinkIndex] || statsByDrink[0];
 
   return (
-    <section id="specs" className="py-32 bg-[#050505] text-white">
+    <section id="specs" className="pt-10 pb-16 md:py-20 bg-[#050505] text-white">
       <div className="max-w-7xl mx-auto px-6 md:px-12">
         <motion.div
           key={`header-${currentDrinkIndex}`}
