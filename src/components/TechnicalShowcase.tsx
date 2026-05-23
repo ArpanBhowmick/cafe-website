@@ -59,7 +59,7 @@ export default function TechnicalShowcase({ currentDrinkIndex = 0 }: TechnicalSh
           <h2 className="text-4xl md:text-6xl font-light">{currentContent.subtitle}</h2>
         </motion.div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 break-words min-w-0">
           {currentContent.stats.map((stat, idx) => (
             <motion.div
               key={`stat-${currentDrinkIndex}-${idx}`}
@@ -67,7 +67,7 @@ export default function TechnicalShowcase({ currentDrinkIndex = 0 }: TechnicalSh
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true, margin: "-50px" }}
               transition={{ duration: 0.5, delay: idx * 0.1 }}
-              className="h-full"
+              className="h-full min-w-0"
             >
               <BorderGlow
                 className="h-full w-full"

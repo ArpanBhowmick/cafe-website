@@ -119,7 +119,7 @@ export default function FeatureRevealSection({ currentDrinkIndex = 0 }: FeatureR
   const currentContent = featuresByDrink[currentDrinkIndex] || featuresByDrink[0];
 
   return (
-    <section id="features" className="bg-black text-white relative pb-5">
+    <section id="features" className="bg-black text-white relative pb-5 overflow-x-hidden">
       
       {/* Cinematic Intro Block */}
       <div className="max-w-7xl mx-auto px-6 md:px-12 pt-16 pb-12">
@@ -168,11 +168,12 @@ export default function FeatureRevealSection({ currentDrinkIndex = 0 }: FeatureR
                   {/* Glassmorphism gradient behind text */}
                   <div className="absolute inset-0 bg-gradient-to-br from-white/[0.03] to-transparent pointer-events-none" />
                   
-                  {/* Left Side: Number & Icon */}
+                  {/* Left Side: Icon Container */}
                   <div className="w-full md:w-1/3 p-8 md:p-12 border-b md:border-b-0 md:border-r border-white/10 flex flex-col justify-between">
-                    <span className="text-6xl md:text-8xl font-light text-white/10">0{idx + 1}</span>
+                    <div className="flex items-center justify-center bg-gradient-to-br from-white/10 to-transparent w-20 h-20 md:w-28 md:h-28 rounded-3xl border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.5)] backdrop-blur-md">
+                      <span className="text-4xl md:text-6xl drop-shadow-2xl">{section.icon}</span>
+                    </div>
                     <div className="mt-8 md:mt-0">
-                      <span className="text-4xl mb-4 block">{section.icon}</span>
                       <p className="text-sm tracking-[0.2em] uppercase text-gray-500 font-medium">{section.title}</p>
                     </div>
                   </div>

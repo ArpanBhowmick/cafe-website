@@ -8,11 +8,13 @@
   html {
     scroll-behavior: smooth;
     @apply font-sans;
+    overflow-x: clip;
   }
 
   body {
     @apply antialiased bg-background text-foreground;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    overflow-x: clip;
   }
   * {
     @apply border-border outline-ring/50;
