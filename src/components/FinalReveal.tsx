@@ -3,6 +3,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
+import PrismaticBurst from './PrismaticBurst';
 
 interface FinalRevealProps {
   onPreOrderClick?: () => void;
@@ -11,7 +12,17 @@ interface FinalRevealProps {
 export default function FinalReveal({ onPreOrderClick }: FinalRevealProps) {
   return (
     <section className="relative w-full min-h-[80vh] flex flex-col items-center justify-center bg-black overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-t from-white/[0.02] to-transparent pointer-events-none" />
+      {/* Background Prismatic Effect */}
+      <div className="absolute inset-0 z-0 pointer-events-auto">
+        <PrismaticBurst 
+          intensity={1.5}
+          speed={0.8}
+          animationType="hover"
+          mixBlendMode="screen"
+        />
+      </div>
+
+      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent pointer-events-none z-[1]" />
       
       <div className="z-10 text-center px-6 mt-20">
         <motion.p 
