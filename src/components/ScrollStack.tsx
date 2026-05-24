@@ -1,4 +1,4 @@
-import React, { useRef, useState, useLayoutEffect } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import type { ReactNode } from 'react';
 import { motion, useScroll, useTransform, useMotionTemplate } from 'framer-motion';
 
@@ -109,10 +109,11 @@ const ScrollStack: React.FC<ScrollStackProps> = ({
     (child): child is React.ReactElement<ScrollStackItemProps> => React.isValidElement(child)
   );
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     const updateMetrics = () => {
-      const container = containerRef.current;
-      if (!container) return;
+      requestAnimationFrame(() => {
+        const container = containerRef.current;
+        if (!container) return;
 
       const wh = window.innerHeight;
       setWindowHeight(wh);
@@ -134,6 +135,7 @@ const ScrollStack: React.FC<ScrollStackProps> = ({
       });
 
       setMetrics(newMetrics);
+      });
     };
 
     updateMetrics();

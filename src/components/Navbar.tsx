@@ -52,7 +52,7 @@ export default function Navbar({ onPreOrderClick }: NavbarProps) {
           <nav className="hidden md:flex items-center space-x-8 text-sm font-medium tracking-wide text-gray-300">
             <a href="#features" className="hover:text-white transition-colors cursor-pointer">Features</a>
             <a href="#specs" className="hover:text-white transition-colors cursor-pointer">Specs</a>
-            <a href="#gallery" className="hover:text-white transition-colors cursor-pointer">Gallery</a>
+
             <button 
               onClick={onPreOrderClick}
               className="bg-white text-black px-5 py-2 rounded-full hover:bg-gray-200 transition-colors cursor-pointer"
@@ -87,9 +87,7 @@ export default function Navbar({ onPreOrderClick }: NavbarProps) {
               <motion.a 
                 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
                 href="#specs" onClick={() => setMenuOpen(false)} className="cursor-pointer">Specs</motion.a>
-              <motion.a 
-                initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
-                href="#gallery" onClick={() => setMenuOpen(false)} className="cursor-pointer">Gallery</motion.a>
+
               <motion.button 
                 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}
                 onClick={() => {

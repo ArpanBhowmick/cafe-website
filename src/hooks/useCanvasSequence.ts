@@ -38,27 +38,30 @@ export const useCanvasSequence = (frameCount: number, pathPrefix: string = '/fra
     };
 
     const loadSequence = async () => {
-      // 1. Prioritize the first 20 frames for instant visual feedback
-      const initialBatchSize = Math.min(20, frameCount);
-      const initialPromises = [];
-      for (let i = 0; i < initialBatchSize; i++) {
-        initialPromises.push(loadFrame(i));
-      }
+      // 1. Prioritize ONLY the first frame for instant visual feedback and NO_FCP fix
+      await loadFrame(0);
       
-      await Promise.all(initialPromises);
       if (isCancelled) return;
-      setLoaded(true); // Reveal the canvas after first batch is completely ready
+      setLoaded(true); // Reveal the canvas INSTANTLY
 
-      // 2. Load the rest sequentially in chunks of 5 to avoid network/memory congestion
-      const chunkSize = 5;
-      for (let i = initialBatchSize; i < frameCount; i += chunkSize) {
-        if (isCancelled) break;
-        const chunkPromises = [];
-        for (let j = 0; j < chunkSize && i + j < frameCount; j++) {
-          chunkPromises.push(loadFrame(i + j));
+      // 2. Load the rest sequentially in chunks in the background without blocking
+      const loadRemaining = async () => {
+        const chunkSize = 5;
+        for (let i = 1; i < frameCount; i += chunkSize) {
+          if (isCancelled) break;
+          const chunkPromises = [];
+          for (let j = 0; j < chunkSize && i + j < frameCount; j++) {
+            chunkPromises.push(loadFrame(i + j));
+          }
+          await Promise.all(chunkPromises);
+          
+          // Yield to main thread between chunks to prevent jank and maintain 60fps scrolling
+          await new Promise(resolve => setTimeout(resolve, 5));
         }
-        await Promise.all(chunkPromises);
-      }
+      };
+
+      // Fire and forget - do not await so we don't block the UI
+      loadRemaining();
     };
 
     loadSequence();
