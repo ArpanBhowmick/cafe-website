@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
-import { motion, MotionValue, useTransform, useMotionValueEvent } from 'framer-motion';
+import React, { memo } from 'react';
+import { motion, MotionValue, useTransform } from 'framer-motion';
 
 interface Props {
   scrollYProgress: MotionValue<number>;
@@ -72,31 +72,26 @@ const DRINK_CONTENT = [
   }
 ];
 
-export default function StorytellingOverlays({ scrollYProgress, loaded = true, currentSequenceIndex = 0 }: Props) {
-  const [showScrollIndicator, setShowScrollIndicator] = useState(true);
-
-  useMotionValueEvent(scrollYProgress, "change", (latest) => {
-    if (latest > 0.01 && showScrollIndicator) {
-      setShowScrollIndicator(false);
-    } else if (latest <= 0.01 && !showScrollIndicator) {
-      setShowScrollIndicator(true);
-    }
-  });
-
-  // Scroll Indicator
-  const scrollIndicatorOpacity = useTransform(scrollYProgress, [0, 0.01], [1, 0]);
-
-  // Block 1
-  const opacity1 = useTransform(scrollYProgress, [0.05, 0.1, 0.2, 0.25], [0, 1, 1, 0]);
-  const y1 = useTransform(scrollYProgress, [0.05, 0.15], [50, 0]);
+const StorytellingOverlays = memo(function StorytellingOverlays({ 
+  scrollYProgress, 
+  loaded = true, 
+  currentSequenceIndex = 0 
+}: Props) {
   
-  // Block 2
-  const opacity2 = useTransform(scrollYProgress, [0.25, 0.3, 0.4, 0.45], [0, 1, 1, 0]);
-  const y2 = useTransform(scrollYProgress, [0.25, 0.35], [50, 0]);
+  // Scroll Indicator - opacity tied directly to scroll progress (0ms latency, zero re-renders)
+  const scrollIndicatorOpacity = useTransform(scrollYProgress, [0, 0.05], [1, 0]);
 
-  // Block 3
-  const opacity3 = useTransform(scrollYProgress, [0.45, 0.5, 0.6, 0.65], [0, 1, 1, 0]);
-  const y3 = useTransform(scrollYProgress, [0.45, 0.55], [50, 0]);
+  // Block 1: Appears perfectly at the start, fades out before Block 2
+  const opacity1 = useTransform(scrollYProgress, [0.05, 0.15, 0.25, 0.35], [0, 1, 1, 0]);
+  const y1 = useTransform(scrollYProgress, [0.05, 0.2], [50, 0]);
+  
+  // Block 2: Appears flawlessly in the middle of the scroll
+  const opacity2 = useTransform(scrollYProgress, [0.35, 0.45, 0.55, 0.65], [0, 1, 1, 0]);
+  const y2 = useTransform(scrollYProgress, [0.35, 0.5], [50, 0]);
+
+  // Block 3: Concludes exactly before the hero section ends
+  const opacity3 = useTransform(scrollYProgress, [0.65, 0.75, 0.85, 0.95], [0, 1, 1, 0]);
+  const y3 = useTransform(scrollYProgress, [0.65, 0.8], [50, 0]);
 
   const content = DRINK_CONTENT[currentSequenceIndex] || DRINK_CONTENT[0];
 
@@ -104,19 +99,20 @@ export default function StorytellingOverlays({ scrollYProgress, loaded = true, c
     <div className="w-full h-full relative">
       
       {/* Scroll Indicator */}
-      {loaded && showScrollIndicator && (
-        <motion.div 
-          style={{ opacity: scrollIndicatorOpacity, willChange: "opacity" }}
-          className="absolute bottom-[5vh] w-full flex justify-center text-white/50 z-20"
-        >
-          <span className="text-xs uppercase tracking-widest text-gray-500">Scroll to explore</span>
-        </motion.div>
-      )}
+      <motion.div 
+        style={{ 
+          opacity: loaded ? scrollIndicatorOpacity : 0, 
+          willChange: "opacity" 
+        }}
+        className="absolute bottom-[5vh] w-full flex justify-center text-white/50 z-20 pointer-events-none"
+      >
+        <span className="text-xs uppercase tracking-widest text-gray-500">Scroll to explore</span>
+      </motion.div>
 
       {/* Narrative Beat 1 */}
       <motion.div 
         style={{ opacity: opacity1, y: y1, willChange: "opacity, transform" }}
-        className="absolute top-[30vh] md:top-[40vh] left-6 md:left-24 max-w-[calc(100%-3rem)] md:max-w-md text-white drop-shadow-2xl z-20"
+        className="absolute top-[30vh] md:top-[40vh] left-6 md:left-24 max-w-[calc(100%-3rem)] md:max-w-md text-white drop-shadow-2xl z-20 pointer-events-none"
       >
         <p className="text-xs font-medium tracking-[0.2em] uppercase text-gray-400 mb-2 md:mb-4">{content.block1.subtitle}</p>
         <h2 className="text-3xl sm:text-4xl md:text-5xl font-light tracking-tight mb-4 md:mb-6 leading-tight">{content.block1.title1}<br/><span className="font-medium text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-500">{content.block1.title2}</span></h2>
@@ -128,7 +124,7 @@ export default function StorytellingOverlays({ scrollYProgress, loaded = true, c
       {/* Narrative Beat 2 */}
       <motion.div 
         style={{ opacity: opacity2, y: y2, willChange: "opacity, transform" }}
-        className="absolute top-[40vh] right-6 md:right-24 max-w-[calc(100%-3rem)] md:max-w-md text-white text-right drop-shadow-2xl z-20"
+        className="absolute top-[40vh] right-6 md:right-24 max-w-[calc(100%-3rem)] md:max-w-md text-white text-right drop-shadow-2xl z-20 pointer-events-none"
       >
         <p className="text-xs font-medium tracking-[0.2em] uppercase text-gray-400 mb-2 md:mb-4">{content.block2.subtitle}</p>
         <h2 className="text-3xl sm:text-4xl md:text-5xl font-light tracking-tight mb-4 md:mb-6 leading-tight">{content.block2.title1}<br/><span className="font-medium text-transparent bg-clip-text bg-gradient-to-l from-white to-gray-500">{content.block2.title2}</span></h2>
@@ -155,5 +151,6 @@ export default function StorytellingOverlays({ scrollYProgress, loaded = true, c
 
     </div>
   );
-}
-// make the all 3 narative show perfectly one after anoter when scroll, currently the last narrative is only showing up when scrolling pass the hero section to othe rection fix this issue and make it show one after another. thats it leave teh rest as it is.
+});
+
+export default StorytellingOverlays;

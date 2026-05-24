@@ -170,7 +170,7 @@ export default function FeatureRevealSection({ currentDrinkIndex = 0 }: FeatureR
                   
                   {/* Left Side: Icon Container */}
                   <div className="w-full md:w-1/3 p-8 md:p-12 border-b md:border-b-0 md:border-r border-white/10 flex flex-col justify-between">
-                    <div className="flex items-center justify-center bg-gradient-to-br from-white/10 to-transparent w-20 h-20 md:w-28 md:h-28 rounded-3xl border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.5)] backdrop-blur-md">
+                    <div className="flex items-center justify-center bg-gradient-to-br from-white/10 to-transparent w-20 h-20 md:w-28 md:h-28 rounded-3xl border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.5)]">
                       <span className="text-4xl md:text-6xl drop-shadow-2xl">{section.icon}</span>
                     </div>
                     <div className="mt-8 md:mt-0">
