@@ -2,6 +2,16 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
+import { 
+  PremiumLeaf, 
+  PremiumDrop, 
+  PremiumSparkle, 
+  PremiumCup, 
+  PremiumBean, 
+  PremiumGear, 
+  PremiumFlame, 
+  PremiumBoba 
+} from './PremiumIcons';
 import BorderGlow from './BorderGlow';
 import ScrollStack, { ScrollStackItem } from './ScrollStack';
 
@@ -19,25 +29,25 @@ const featuresByDrink = [
         title: "The Foundation",
         subtitle: "Premium Ingredients",
         content: "100% Ceremonial Grade Uji Matcha, shade-grown and stone-ground to preserve its vibrant color and delicate nutrients. Blended only with pure hot water or lightly steamed oat milk for the perfect latte.",
-        icon: "🍃"
+        icon: <PremiumLeaf color="#4ade80" />
       },
       {
         title: "The Process",
         subtitle: "How It's Made",
         content: "Carefully measured into a warmed bowl, hot water is added at exactly 175°F. It is then vigorously whisked in a 'W' motion using a traditional bamboo chasen until a perfect, jade-green froth forms.",
-        icon: "🏺"
+        icon: <PremiumDrop color="#4ade80" />
       },
       {
         title: "The Wellness",
         subtitle: "Health Benefits",
         content: "Packed with L-theanine for sustained, jitter-free energy and calm focus. Exceptionally rich in antioxidants (EGCG) to support metabolism and overall vitality.",
-        icon: "✨"
+        icon: <PremiumSparkle color="#4ade80" />
       },
       {
         title: "The Experience",
         subtitle: "Taste Profile",
         content: "Deeply earthy and umami-rich, balanced with a natural, subtle sweetness. It finishes with a vibrant, grassy note that lingers gently on the palate.",
-        icon: "🍵"
+        icon: <PremiumCup color="#4ade80" />
       }
     ]
   },
@@ -53,25 +63,25 @@ const featuresByDrink = [
         title: "The Foundation",
         subtitle: "Premium Ingredients",
         content: "Freshly roasted, ethically sourced Arabica beans ground moments before brewing. Paired with precisely filtered water and your choice of perfectly steamed milk.",
-        icon: "☕"
+        icon: <PremiumBean color="#d97706" />
       },
       {
         title: "The Process",
         subtitle: "How It's Made",
         content: "A double ristretto shot is pulled with precise pressure and timing. Simultaneously, milk is micro-aerated to create a dense, velvety foam that is gently folded into the crema.",
-        icon: "⚙️"
+        icon: <PremiumGear color="#d97706" />
       },
       {
         title: "The Wellness",
         subtitle: "Health Benefits",
         content: "A natural source of robust energy and mental clarity. Rich in essential antioxidants from the dark roast, supporting heart health and cognitive function.",
-        icon: "🔥"
+        icon: <PremiumFlame color="#d97706" />
       },
       {
         title: "The Experience",
         subtitle: "Taste Profile",
         content: "A bold, full-bodied espresso foundation perfectly harmonized by the natural, caramelized sweetness of thick microfoam. Rich, warm, and deeply comforting.",
-        icon: "🤎"
+        icon: <PremiumCup color="#d97706" />
       }
     ]
   },
@@ -87,25 +97,25 @@ const featuresByDrink = [
         title: "The Foundation",
         subtitle: "Premium Ingredients",
         content: "Real, fresh Taro root, premium Jasmine Green Tea, rich dairy or oat creamer, and our signature slow-cooked Tapioca Pearls bathed in dark brown sugar.",
-        icon: "🍠"
+        icon: <PremiumLeaf color="#c084fc" />
       },
       {
         title: "The Process",
         subtitle: "How It's Made",
         content: "Fresh taro is cooked until tender, then blended smoothly into a creamy tea base. It is then poured over warm, caramelized boba pearls prepared fresh every morning.",
-        icon: "🥣"
+        icon: <PremiumDrop color="#c084fc" />
       },
       {
         title: "The Wellness",
         subtitle: "Health Benefits",
         content: "Taro root provides a healthy dose of dietary fiber, potassium, and complex carbohydrates for sustained energy, while Jasmine tea offers gentle antioxidants.",
-        icon: "💜"
+        icon: <PremiumSparkle color="#c084fc" />
       },
       {
         title: "The Experience",
         subtitle: "Taste Profile",
         content: "Incredibly creamy, sweet, and wonderfully nutty with subtle hints of vanilla. The texture is a delightful contrast between smooth milk tea and warm, chewy boba.",
-        icon: "🧋"
+        icon: <PremiumBoba color="#c084fc" />
       }
     ]
   }
@@ -170,9 +180,17 @@ export default function FeatureRevealSection({ currentDrinkIndex = 0 }: FeatureR
                   
                   {/* Left Side: Icon Container */}
                   <div className="w-full md:w-1/3 p-8 md:p-12 border-b md:border-b-0 md:border-r border-white/10 flex flex-col justify-between">
-                    <div className="flex items-center justify-center bg-gradient-to-br from-white/10 to-transparent w-20 h-20 md:w-28 md:h-28 rounded-3xl border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.5)]">
-                      <span className="text-4xl md:text-6xl drop-shadow-2xl">{section.icon}</span>
-                    </div>
+                    <motion.div 
+                      className="flex items-center justify-center bg-gradient-to-br from-white/10 to-transparent w-24 h-24 md:w-32 md:h-32 rounded-3xl border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.5)] cursor-default overflow-hidden relative group"
+                      whileHover={{ scale: 1.05 }}
+                      transition={{ duration: 0.4, ease: "easeOut" }}
+                    >
+                      {/* Sweeping Shimmer Effect on Hover */}
+                      <motion.div 
+                        className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/20 to-transparent -translate-x-[150%] skew-x-[-30deg] group-hover:animate-[shimmer_1.5s_infinite]"
+                      />
+                      <span className="relative z-10 flex items-center justify-center">{section.icon}</span>
+                    </motion.div>
                     <div className="mt-8 md:mt-0">
                       <p className="text-sm tracking-[0.2em] uppercase text-gray-500 font-medium">{section.title}</p>
                     </div>
