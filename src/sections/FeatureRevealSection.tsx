@@ -11,9 +11,9 @@ import {
   PremiumGear, 
   PremiumFlame, 
   PremiumBoba 
-} from './PremiumIcons';
-import BorderGlow from './BorderGlow';
-import ScrollStack, { ScrollStackItem } from './ScrollStack';
+} from '../components/PremiumIcons';
+import BorderGlow from '../components/BorderGlow';
+import ScrollStack, { ScrollStackItem } from '../components/ScrollStack';
 
 // Expanded cinematic data
 const featuresByDrink = [

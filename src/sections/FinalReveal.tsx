@@ -3,7 +3,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
-import PrismaticBurst from './PrismaticBurst';
+import PrismaticBurst from '../components/PrismaticBurst';
 
 interface FinalRevealProps {
   onPreOrderClick?: () => void;

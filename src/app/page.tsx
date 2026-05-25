@@ -9,17 +9,17 @@ const CanvasScroll = dynamic(() => import('@/components/CanvasScroll'), {
   loading: () => <div className="w-full h-[500vh] bg-black"><div className="sticky top-0 h-screen flex items-center justify-center bg-black"><div className="w-8 h-8 border-4 border-white/20 border-t-white rounded-full animate-spin"></div></div></div>
 });
 
-const FeatureRevealSection = dynamic(() => import('@/components/FeatureRevealSection'), { 
+const FeatureRevealSection = dynamic(() => import('@/sections/FeatureRevealSection'), { 
   ssr: false,
   loading: () => <div className="w-full h-screen bg-black" />
 });
 
-const TechnicalShowcase = dynamic(() => import('@/components/TechnicalShowcase'), { 
+const TechnicalShowcase = dynamic(() => import('@/sections/TechnicalShowcase'), { 
   ssr: false,
   loading: () => <div className="w-full h-screen bg-black" />
 });
 
-const FinalReveal = dynamic(() => import('@/components/FinalReveal'), { ssr: false });
+const FinalReveal = dynamic(() => import('@/sections/FinalReveal'), { ssr: false });
 import Footer from '@/components/Footer';
 import PreOrderModal from '@/components/PreOrderModal';
 

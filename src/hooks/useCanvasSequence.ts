@@ -1,34 +1,42 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 export const useCanvasSequence = (frameCount: number, pathPrefix: string = '/frames/frame_', padLength: number = 4) => {
   const [images, setImages] = useState<HTMLImageElement[]>([]);
   const [loaded, setLoaded] = useState(false);
+  const currentTargetRef = useRef(0);
 
   useEffect(() => {
     let isCancelled = false;
-    // Pre-allocate the array
     const imgArray: HTMLImageElement[] = new Array(frameCount);
     setLoaded(false); 
     
-    // Create image objects immediately
     for (let i = 0; i < frameCount; i++) {
       imgArray[i] = new Image();
     }
     setImages(imgArray);
 
+    const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+    const MAX_CONCURRENT_LOADS = isMobile ? 2 : 4;
+    // On mobile, only keep a smaller window of frames in memory to prevent OOM
+    const MEMORY_WINDOW_SIZE = isMobile ? 30 : frameCount; 
+
     const loadFrame = async (index: number) => {
       if (isCancelled) return;
       const img = imgArray[index];
+      if (img.src) return;
+      
       const paddedIndex = (index + 1).toString().padStart(padLength, '0');
       
       return new Promise<void>((resolve) => {
         img.onload = async () => {
           if (isCancelled) return resolve();
           try {
-            // Off-thread decoding to prevent main thread jank when drawn to canvas
             await img.decode();
           } catch (e) {
-            // Silently fail, it will just decode on the main thread later
+            // Silently fail
+          }
+          if (typeof window !== 'undefined') {
+            window.dispatchEvent(new CustomEvent('frameLoaded', { detail: index }));
           }
           resolve();
         };
@@ -38,40 +46,74 @@ export const useCanvasSequence = (frameCount: number, pathPrefix: string = '/fra
     };
 
     const loadSequence = async () => {
-      // 1. Prioritize ONLY the first frame for instant visual feedback and NO_FCP fix
       await loadFrame(0);
-      
       if (isCancelled) return;
-      setLoaded(true); // Reveal the canvas INSTANTLY
+      setLoaded(true);
 
-      // 2. Load the rest sequentially in chunks in the background without blocking
-      const loadRemaining = async () => {
-        const chunkSize = 5;
-        for (let i = 1; i < frameCount; i += chunkSize) {
-          if (isCancelled) break;
-          const chunkPromises = [];
-          for (let j = 0; j < chunkSize && i + j < frameCount; j++) {
-            chunkPromises.push(loadFrame(i + j));
-          }
-          await Promise.all(chunkPromises);
+      // Listen for scroll target updates
+      const handleTargetUpdate = (e: Event) => {
+        const target = (e as CustomEvent).detail;
+        currentTargetRef.current = target;
+      };
+      
+      if (typeof window !== 'undefined') {
+        window.addEventListener('targetFrameUpdate', handleTargetUpdate);
+      }
+
+      // Background loading loop based on current target
+      const loadLoop = async () => {
+        while (!isCancelled) {
+          const target = currentTargetRef.current;
+          const toLoad: number[] = [];
           
-          // Yield to main thread between chunks to prevent jank and maintain 60fps scrolling
-          await new Promise(resolve => setTimeout(resolve, 5));
+          // Determine which frames to load around the target
+          const searchRadius = isMobile ? 15 : frameCount;
+          for (let r = 0; r <= searchRadius; r++) {
+            const down = target - r;
+            const up = target + r;
+            
+            if (down > 0 && !imgArray[down]?.src) toLoad.push(down);
+            if (up < frameCount && !imgArray[up]?.src) toLoad.push(up);
+            if (toLoad.length >= MAX_CONCURRENT_LOADS) break;
+          }
+
+          if (toLoad.length > 0) {
+            await Promise.all(toLoad.slice(0, MAX_CONCURRENT_LOADS).map(loadFrame));
+          }
+
+          // Memory Management (Sliding Window)
+          if (isMobile) {
+            for (let i = 0; i < frameCount; i++) {
+              if (Math.abs(i - target) > MEMORY_WINDOW_SIZE && imgArray[i]?.src) {
+                imgArray[i].src = ''; // Release memory
+                imgArray[i].onload = null;
+                imgArray[i].onerror = null;
+              }
+            }
+          }
+          
+          // Yield to main thread
+          await new Promise(resolve => setTimeout(resolve, 10));
         }
       };
 
-      // Fire and forget - do not await so we don't block the UI
-      loadRemaining();
+      loadLoop();
+      
+      return () => {
+        if (typeof window !== 'undefined') {
+          window.removeEventListener('targetFrameUpdate', handleTargetUpdate);
+        }
+      };
     };
 
-    loadSequence();
+    const cleanupLoadLoop = loadSequence();
     
     return () => {
       isCancelled = true;
+      cleanupLoadLoop.then(cleanup => cleanup && cleanup());
       imgArray.forEach(img => {
         img.onload = null;
         img.onerror = null;
-        // Optionally empty src to free memory if unmounted quickly
         img.src = '';
       });
     };

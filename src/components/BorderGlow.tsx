@@ -192,7 +192,7 @@ const BorderGlow: React.FC<BorderGlowProps> = ({
 
       {/* mesh gradient fill near edges */}
       <div
-        className="absolute inset-0 rounded-[inherit] -z-[1]"
+        className="hidden md:block absolute inset-0 rounded-[inherit] -z-[1]"
         style={{
           border: '1px solid transparent',
           background: fillBg.join(', '),
@@ -216,7 +216,7 @@ const BorderGlow: React.FC<BorderGlowProps> = ({
 
       {/* outer glow */}
       <span
-        className="absolute pointer-events-none z-[1] rounded-[inherit]"
+        className="hidden md:block absolute pointer-events-none z-[1] rounded-[inherit]"
         style={{
           inset: `${-glowRadius}px`,
           maskImage: `conic-gradient(from ${angleDeg} at center, black 2.5%, transparent 10%, transparent 90%, black 97.5%)`,

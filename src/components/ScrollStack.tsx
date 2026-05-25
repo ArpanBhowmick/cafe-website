@@ -48,7 +48,9 @@ const ScrollCard = ({
   itemDistance,
   itemStackDistance,
   stackPosition,
+  windowWidth,
 }: any) => {
+  const isMobile = windowWidth > 0 && windowWidth < 768;
   const targetScale = baseScale + index * itemScale;
   
   // Safe defaults before measurements are complete
@@ -58,15 +60,17 @@ const ScrollCard = ({
   // Cinematic transforms driven strictly by the GPU compositor
   const scale = useTransform(scrollY, [start, end], [1, targetScale], { clamp: true });
   const rotate = useTransform(scrollY, [start, end], [0, index * rotationAmount], { clamp: true });
-  const blurValue = useTransform(scrollY, [start, end], [0, index > 0 ? blurAmount : 0], { clamp: true });
+  const blurValue = useTransform(scrollY, [start, end], [0, index > 0 && !isMobile ? blurAmount : 0], { clamp: true });
   const filter = useMotionTemplate`blur(${blurValue}px)`;
 
   const stackPositionPx = windowHeight ? parsePercentage(stackPosition, windowHeight) : 0;
   const stickyTop = stackPositionPx + index * itemStackDistance;
+  
+  const shadowClass = isMobile ? '' : 'shadow-[0_0_30px_rgba(0,0,0,0.1)]';
 
   return (
     <motion.div
-      className={`scroll-stack-card sticky origin-top will-change-transform shadow-[0_0_30px_rgba(0,0,0,0.1)] box-border ${childProps.itemClassName || ''}`.trim()}
+      className={`scroll-stack-card sticky origin-top will-change-transform ${shadowClass} box-border ${childProps.itemClassName || ''}`.trim()}
       style={{
         top: stickyTop,
         marginBottom: index < totalCards - 1 ? itemDistance : 0,
@@ -100,6 +104,7 @@ const ScrollStack: React.FC<ScrollStackProps> = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const [metrics, setMetrics] = useState<{ triggerStart: number; triggerEnd: number }[]>([]);
   const [windowHeight, setWindowHeight] = useState(0);
+  const [windowWidth, setWindowWidth] = useState(0);
 
   // Use Framer Motion's ultra-smooth scroll hook
   const { scrollY } = useScroll();
@@ -116,7 +121,9 @@ const ScrollStack: React.FC<ScrollStackProps> = ({
         if (!container) return;
 
       const wh = window.innerHeight;
+      const ww = window.innerWidth;
       setWindowHeight(wh);
+      setWindowWidth(ww);
 
       const stackPositionPx = parsePercentage(stackPosition, wh);
       const scaleEndPositionPx = parsePercentage(scaleEndPosition, wh);
@@ -169,6 +176,7 @@ const ScrollStack: React.FC<ScrollStackProps> = ({
             metrics={metrics[i]}
             scrollY={scrollY}
             windowHeight={windowHeight}
+            windowWidth={windowWidth}
             baseScale={baseScale}
             itemScale={itemScale}
             rotationAmount={rotationAmount}

@@ -112,7 +112,7 @@ const StorytellingOverlays = memo(function StorytellingOverlays({
       {/* Narrative Beat 1 */}
       <motion.div 
         style={{ opacity: opacity1, y: y1, willChange: "opacity, transform" }}
-        className="absolute top-[30vh] md:top-[40vh] left-6 md:left-24 max-w-[calc(100%-3rem)] md:max-w-md text-white drop-shadow-2xl z-20 pointer-events-none"
+        className="absolute top-[30vh] md:top-[40vh] left-6 md:left-24 max-w-[calc(100%-3rem)] md:max-w-md text-white drop-shadow-md md:drop-shadow-2xl z-20 pointer-events-none"
       >
         <p className="text-xs font-medium tracking-[0.2em] uppercase text-gray-400 mb-2 md:mb-4">{content.block1.subtitle}</p>
         <h2 className="text-3xl sm:text-4xl md:text-5xl font-light tracking-tight mb-4 md:mb-6 leading-tight">{content.block1.title1}<br/><span className="font-medium text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-500">{content.block1.title2}</span></h2>
@@ -124,7 +124,7 @@ const StorytellingOverlays = memo(function StorytellingOverlays({
       {/* Narrative Beat 2 */}
       <motion.div 
         style={{ opacity: opacity2, y: y2, willChange: "opacity, transform" }}
-        className="absolute top-[40vh] right-6 md:right-24 max-w-[calc(100%-3rem)] md:max-w-md text-white text-right drop-shadow-2xl z-20 pointer-events-none"
+        className="absolute top-[40vh] right-6 md:right-24 max-w-[calc(100%-3rem)] md:max-w-md text-white text-right drop-shadow-md md:drop-shadow-2xl z-20 pointer-events-none"
       >
         <p className="text-xs font-medium tracking-[0.2em] uppercase text-gray-400 mb-2 md:mb-4">{content.block2.subtitle}</p>
         <h2 className="text-3xl sm:text-4xl md:text-5xl font-light tracking-tight mb-4 md:mb-6 leading-tight">{content.block2.title1}<br/><span className="font-medium text-transparent bg-clip-text bg-gradient-to-l from-white to-gray-500">{content.block2.title2}</span></h2>
@@ -137,7 +137,7 @@ const StorytellingOverlays = memo(function StorytellingOverlays({
       <div className="absolute bottom-[20vh] w-full flex justify-center pointer-events-none z-20">
         <motion.div 
           style={{ opacity: opacity3, y: y3, willChange: "opacity, transform" }}
-          className="max-w-[calc(100%-3rem)] md:max-w-2xl text-white text-center drop-shadow-2xl px-6"
+          className="max-w-[calc(100%-3rem)] md:max-w-2xl text-white text-center drop-shadow-md md:drop-shadow-2xl px-6"
         >
           <h2 className="text-4xl sm:text-5xl md:text-7xl font-medium tracking-tighter mb-4 md:mb-6">
             {content.block3.title1} <br className="md:hidden" />

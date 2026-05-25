@@ -39,18 +39,17 @@ export default function CanvasScroll({ frameCount: _ignored, onSequenceChange }:
   });
 
   const toggleSequence = (direction: 'left' | 'right') => {
-    if (direction === 'left') {
-      setCurrentSequenceIndex((prev) => {
-        const next = prev > 0 ? prev - 1 : SEQUENCES.length - 1;
-        if (onSequenceChange) onSequenceChange(next);
-        return next;
-      });
-    } else {
-      setCurrentSequenceIndex((prev) => {
-        const next = prev < SEQUENCES.length - 1 ? prev + 1 : 0;
-        if (onSequenceChange) onSequenceChange(next);
-        return next;
-      });
+    // FIX: Calculate the next index using the current state value.
+    // We do NOT use the functional setState callback `(prev) => {}` here 
+    // to avoid calling the parent `onSequenceChange` side-effect during React's render/update phase.
+    const next = direction === 'left' 
+      ? (currentSequenceIndex > 0 ? currentSequenceIndex - 1 : SEQUENCES.length - 1)
+      : (currentSequenceIndex < SEQUENCES.length - 1 ? currentSequenceIndex + 1 : 0);
+    
+    setCurrentSequenceIndex(next);
+    
+    if (onSequenceChange) {
+      onSequenceChange(next);
     }
   };
 
@@ -66,22 +65,51 @@ export default function CanvasScroll({ frameCount: _ignored, onSequenceChange }:
 
     let animationFrameId: number;
     let currentRenderedIndex = -1;
+    let targetRenderIndex = 0; // Track the current target so frameLoaded knows what to check against
     
     // Cached geometry to prevent expensive Math on every frame
     let cachedScale = 1;
     let cachedX = 0;
     let cachedY = 0;
 
-    const renderFrame = (index: number) => {
+    // Helper to find the closest frame that is fully loaded and decoded
+    const getClosestLoadedFrame = (targetIndex: number) => {
+      if (images[targetIndex]?.complete && images[targetIndex]?.naturalWidth > 0) {
+        return targetIndex;
+      }
+      // Search outwards to find the nearest valid frame
+      for (let i = 1; i <= activeSequence.frameCount; i++) {
+        const down = targetIndex - i;
+        const up = targetIndex + i;
+        if (down >= 0 && images[down]?.complete && images[down]?.naturalWidth > 0) return down;
+        if (up < activeSequence.frameCount && images[up]?.complete && images[up]?.naturalWidth > 0) return up;
+      }
+      return currentRenderedIndex !== -1 ? currentRenderedIndex : 0;
+    };
+
+    const renderFrame = (index: number, isVisible: boolean = true) => {
       const imgIndex = Math.min(Math.max(Math.round(index), 0), activeSequence.frameCount - 1);
-      if (imgIndex === currentRenderedIndex) return;
       
-      const img = images[imgIndex];
-      if (img && img.complete) {
-        currentRenderedIndex = imgIndex;
-        // Draw image directly using pre-calculated dimensions.
-        // No fillRect needed because object-fit:cover guarantees full coverage
-        ctx.drawImage(img, cachedX, cachedY, img.width * cachedScale, img.height * cachedScale);
+      if (targetRenderIndex !== imgIndex) {
+        targetRenderIndex = imgIndex; // Update our absolute target
+        window.dispatchEvent(new CustomEvent('targetFrameUpdate', { detail: imgIndex }));
+      }
+      
+      if (!isVisible) return; // Skip expensive canvas drawing if not visible
+
+      const renderIndex = getClosestLoadedFrame(imgIndex);
+      if (renderIndex === currentRenderedIndex) return;
+      
+      const img = images[renderIndex];
+      if (img && img.complete && img.naturalWidth > 0) {
+        currentRenderedIndex = renderIndex;
+        try {
+          // Draw image directly using pre-calculated dimensions.
+          // No fillRect needed because object-fit:cover guarantees full coverage
+          ctx.drawImage(img, cachedX, cachedY, img.naturalWidth * cachedScale, img.naturalHeight * cachedScale);
+        } catch (err) {
+          console.error("Canvas rendering error:", err);
+        }
       }
     };
 
@@ -90,7 +118,9 @@ export default function CanvasScroll({ frameCount: _ignored, onSequenceChange }:
       // Debounce resize to prevent layout thrashing
       clearTimeout(resizeTimeout);
       resizeTimeout = setTimeout(() => {
-        const dpr = window.devicePixelRatio || 1;
+        const isMobile = window.innerWidth < 768;
+        const maxDpr = isMobile ? 1.5 : 2;
+        const dpr = Math.min(window.devicePixelRatio || 1, maxDpr);
         const cw = window.innerWidth;
         const ch = window.innerHeight;
         
@@ -100,10 +130,10 @@ export default function CanvasScroll({ frameCount: _ignored, onSequenceChange }:
         
         // Cache geometry based on the first loaded image
         const sampleImg = images[0];
-        if (sampleImg && sampleImg.width > 0) {
-          cachedScale = Math.max(cw / sampleImg.width, ch / sampleImg.height);
-          cachedX = (cw / 2) - (sampleImg.width / 2) * cachedScale;
-          cachedY = (ch / 2) - (sampleImg.height / 2) * cachedScale;
+        if (sampleImg && sampleImg.naturalWidth > 0) {
+          cachedScale = Math.max(cw / sampleImg.naturalWidth, ch / sampleImg.naturalHeight);
+          cachedX = (cw / 2) - (sampleImg.naturalWidth / 2) * cachedScale;
+          cachedY = (ch / 2) - (sampleImg.naturalHeight / 2) * cachedScale;
         }
         
         // Force render
@@ -114,17 +144,19 @@ export default function CanvasScroll({ frameCount: _ignored, onSequenceChange }:
 
     // Calculate initial geometry synchronously without debounce to avoid flash
     const initGeometry = () => {
-      const dpr = window.devicePixelRatio || 1;
+      const isMobile = window.innerWidth < 768;
+      const maxDpr = isMobile ? 1.5 : 2;
+      const dpr = Math.min(window.devicePixelRatio || 1, maxDpr);
       const cw = window.innerWidth;
       const ch = window.innerHeight;
       canvas.width = cw * dpr;
       canvas.height = ch * dpr;
       ctx.scale(dpr, dpr);
       const sampleImg = images[0];
-      if (sampleImg && sampleImg.width > 0) {
-        cachedScale = Math.max(cw / sampleImg.width, ch / sampleImg.height);
-        cachedX = (cw / 2) - (sampleImg.width / 2) * cachedScale;
-        cachedY = (ch / 2) - (sampleImg.height / 2) * cachedScale;
+      if (sampleImg && sampleImg.naturalWidth > 0) {
+        cachedScale = Math.max(cw / sampleImg.naturalWidth, ch / sampleImg.naturalHeight);
+        cachedX = (cw / 2) - (sampleImg.naturalWidth / 2) * cachedScale;
+        cachedY = (ch / 2) - (sampleImg.naturalHeight / 2) * cachedScale;
       }
       renderFrame(smoothProgress.get() * (activeSequence.frameCount - 1));
     };
@@ -133,6 +165,29 @@ export default function CanvasScroll({ frameCount: _ignored, onSequenceChange }:
     
     window.addEventListener('resize', resizeCanvas, { passive: true });
 
+    // Handle asynchronous frame loads filling in the gaps when scrolling fast
+    const handleFrameLoaded = (e: Event) => {
+      const loadedIndex = (e as CustomEvent).detail;
+      // If the newly loaded frame is exactly our target, or closer than what we currently have on screen
+      if (
+        loadedIndex === targetRenderIndex || 
+        Math.abs(loadedIndex - targetRenderIndex) < Math.abs(currentRenderedIndex - targetRenderIndex)
+      ) {
+        // Render it immediately to prevent waiting for the next scroll event
+        requestAnimationFrame(() => renderFrame(targetRenderIndex));
+      }
+    };
+    window.addEventListener('frameLoaded', handleFrameLoaded);
+
+    // Visibility observation to pause off-screen rendering
+    let isVisible = true;
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        isVisible = entry.isIntersecting;
+      });
+    });
+    if (containerRef.current) observer.observe(containerRef.current);
+
     // Use smoothed progress for buttery transitions
     const unsubscribe = smoothProgress.on('change', (latest) => {
       if (animationFrameId) {
@@ -140,12 +195,14 @@ export default function CanvasScroll({ frameCount: _ignored, onSequenceChange }:
       }
       animationFrameId = requestAnimationFrame(() => {
         const index = latest * (activeSequence.frameCount - 1);
-        renderFrame(index);
+        renderFrame(index, isVisible);
       });
     });
 
     return () => {
       window.removeEventListener('resize', resizeCanvas);
+      window.removeEventListener('frameLoaded', handleFrameLoaded);
+      observer.disconnect();
       clearTimeout(resizeTimeout);
       unsubscribe();
       if (animationFrameId) cancelAnimationFrame(animationFrameId);
